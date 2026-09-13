@@ -1,6 +1,7 @@
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FILE_INPUT_ID } from "@/components/upload-context";
+import { ShareMix } from "@/components/share-mix";
 
 type SiteHeaderProps = {
   trackCount: number;
@@ -22,12 +23,15 @@ export function SiteHeader({ trackCount, compact = false }: SiteHeaderProps) {
           ) : null}
         </div>
         {compact ? (
-          <Button size="sm" asChild>
-            <label htmlFor={FILE_INPUT_ID} className="cursor-pointer">
-              <Upload className="size-4" />
-              Add
-            </label>
-          </Button>
+          <div className="flex shrink-0 items-center gap-1">
+            <ShareMix size="icon-sm" />
+            <Button size="sm" asChild>
+              <label htmlFor={FILE_INPUT_ID} className="cursor-pointer">
+                <Upload className="size-4" />
+                Add
+              </label>
+            </Button>
+          </div>
         ) : (
           <p className="hidden text-sm text-muted sm:block">Family mix</p>
         )}

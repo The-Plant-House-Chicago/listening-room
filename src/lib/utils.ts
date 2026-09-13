@@ -25,5 +25,6 @@ export function hashSeed(value: string): number {
     h ^= value.charCodeAt(i);
     h = Math.imul(h, 16777619);
   }
-  return h >>> 0;
+  return (h >>> 0) % 2147483647;
 }
+

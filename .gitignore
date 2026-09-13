@@ -8,4 +8,5 @@ artifacts/
 .grok/status
 .output/
 dist/
+.data/
 *.log

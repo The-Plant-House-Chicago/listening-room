@@ -2,20 +2,25 @@ import { create } from "zustand";
 import { toast } from "sonner";
 import { audioSrc, type Track } from "@/lib/track-types";
 
+type RepeatMode = "all" | "one";
+
 type PlayerState = {
   queue: Track[];
   currentId: string | null;
   isPlaying: boolean;
   currentTime: number;
   duration: number;
+  repeat: RepeatMode;
   setQueue: (tracks: Track[]) => void;
   playTrack: (track: Track, startAt?: number) => void;
   toggle: () => void;
   seek: (seconds: number) => void;
   next: () => void;
   prev: () => void;
+  cycleRepeat: () => void;
   stopIfCurrent: (id: string) => void;
 };
+
 
 let media: HTMLVideoElement | null = null;
 let loadGen = 0;
@@ -64,7 +69,13 @@ function getMedia(): HTMLVideoElement | null {
       setPlaybackState("paused");
     });
     el.addEventListener("ended", () => {
-      usePlayer.getState().next();
+      const player = usePlayer.getState();
+      if (player.repeat === "one") {
+        el.currentTime = 0;
+        void el.play().catch(() => undefined);
+        return;
+      }
+      player.next();
     });
     el.addEventListener("error", () => {
       usePlayer.setState({ isPlaying: false });
@@ -193,6 +204,7 @@ export const usePlayer = create<PlayerState>((set, get) => ({
   isPlaying: false,
   currentTime: 0,
   duration: 0,
+  repeat: "all",
   setQueue: (tracks) => set({ queue: tracks }),
   playTrack: (track, startAt = 0) => {
     loadAndPlay(track, startAt);
@@ -249,6 +261,9 @@ export const usePlayer = create<PlayerState>((set, get) => ({
     const index = queue.findIndex((t) => t.id === currentId);
     const prevTrack = queue[(index - 1 + queue.length) % queue.length];
     if (prevTrack) loadAndPlay(prevTrack);
+  },
+  cycleRepeat: () => {
+    set({ repeat: get().repeat === "all" ? "one" : "all" });
   },
   stopIfCurrent: (id) => {
     if (get().currentId !== id) return;

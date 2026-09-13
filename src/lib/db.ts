@@ -111,7 +111,14 @@ async function createPgliteSql(): Promise<Sql> {
   // data survives source edits (it resets on dev-server restart).
   globalRef.__pgliteInstance__ ??= (async () => {
     const { PGlite } = await import("@electric-sql/pglite");
+    // Preview only: persist across dev-server restarts. Deployed serverless
+    // stays in-memory (ephemeral FS) unless DATABASE_URL / Neon is set.
+    const persistPreview =
+      !process.env.VERCEL && !process.env.GROK_PROJECT_ID
+        ? "/workspace/.data/pglite"
+        : undefined;
     const pg = new PGlite({
+      ...(persistPreview ? { dataDir: persistPreview } : {}),
       parsers: {
         [OID_INT8]: Number,
         [OID_DATE]: identity,

@@ -22,7 +22,7 @@ export const createTrack = createServerFn({ method: "POST" })
       fileSize: z.number().int().min(1).max(MAX_AUDIO_BYTES),
       chunkCount: z.number().int().min(1).max(200),
       peaks: z.array(z.number()).max(200),
-      coverSeed: z.number().int().min(0),
+      coverSeed: z.number().int().min(0).max(2_147_483_647),
     }),
   )
   .handler(async ({ data }): Promise<Track> => {
@@ -59,7 +59,7 @@ export const createTrack = createServerFn({ method: "POST" })
         ${data.fileSize},
         ${data.chunkCount},
         ${peaks},
-        ${data.coverSeed},
+        ${data.coverSeed % 2_147_483_647},
         false
       )
       returning id, title, artist, duration_ms, mime_type, file_size, peaks, cover_seed, created_at

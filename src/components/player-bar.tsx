@@ -1,4 +1,4 @@
-import { Pause, Play, SkipBack, SkipForward } from "lucide-react";
+import { Pause, Play, Repeat, Repeat1, SkipBack, SkipForward } from "lucide-react";
 import { CoverDisc } from "@/components/cover-disc";
 import { Button } from "@/components/ui/button";
 import { Waveform } from "@/components/waveform";
@@ -11,16 +11,19 @@ export function PlayerBar() {
   const isPlaying = usePlayer((s) => s.isPlaying);
   const currentTime = usePlayer((s) => s.currentTime);
   const duration = usePlayer((s) => s.duration);
+  const repeat = usePlayer((s) => s.repeat);
   const toggle = usePlayer((s) => s.toggle);
   const seek = usePlayer((s) => s.seek);
   const next = usePlayer((s) => s.next);
   const prev = usePlayer((s) => s.prev);
+  const cycleRepeat = usePlayer((s) => s.cycleRepeat);
 
   const track = queue.find((t) => t.id === currentId);
   if (!track) return null;
 
   const total = duration || track.durationMs / 1000;
   const progress = total > 0 ? currentTime / total : 0;
+  const repeatOne = repeat === "one";
 
   return (
     <div className="px-3 pt-1 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
@@ -80,6 +83,15 @@ export function PlayerBar() {
           </div>
         </div>
         <div className="mt-2 flex items-center gap-3 px-1">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={cycleRepeat}
+            aria-label={repeatOne ? "Repeat this track" : "Repeat the mix"}
+            className={repeatOne ? "text-accent" : "text-muted"}
+          >
+            {repeatOne ? <Repeat1 className="size-4" /> : <Repeat className="size-4" />}
+          </Button>
           <span className="w-10 shrink-0 text-right font-mono text-xs tabular-nums text-subtle">
             {formatTime(currentTime)}
           </span>
